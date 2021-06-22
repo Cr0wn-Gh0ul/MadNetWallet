@@ -23,6 +23,9 @@ function BlockExplorer(props) {
     // Sumbit initial query params
     const handleSubmit = async (event) => {
         event.preventDefault()
+        if (!blockNumber || blockNumber === 0) {
+            return
+        }
         store.madNetAdapter.viewBlock(blockNumber)
     }
 

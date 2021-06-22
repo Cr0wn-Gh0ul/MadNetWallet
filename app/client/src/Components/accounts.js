@@ -205,7 +205,8 @@ function Accounts(props) {
                     <Segment raised placeholder textAlign="center">
                     <Button floated="right" onClick={() => setOpen(true)} className="green">Create Keystore</Button>
                     <Divider/>
-                        <Grid columns={2} relaxed='very' stackable>
+                        <Grid columns={2} stackable textAlign="center">
+
                             <Grid.Column>
                                 <Form>
                                     <Button

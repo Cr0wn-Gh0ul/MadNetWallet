@@ -286,6 +286,7 @@ class Web3Adapter {
             }
             await this.updateAccount();
         } catch (ex) {
+            console.log(ex)
             await this.cb.call(this, "error", String(ex));
             return;
         }
@@ -395,7 +396,7 @@ class Web3Adapter {
     async deposit(amount) {
         try {
             await this.method("deposit", "deposit", {
-                "amount": amount
+                "amount": amount.toString()
             });
         } catch (ex) {
             await this.cb.call(this, "error", String(ex))

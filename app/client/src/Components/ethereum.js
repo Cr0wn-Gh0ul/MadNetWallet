@@ -9,7 +9,7 @@ function Ethereum(props) {
     // Ethereum options
     const [opts, updateOpts] = useState({});
     // Contracts, methods, arguments to be fulfilled by the web3Adapter
-    const [contractFn, updateContractFn] = useState({ "staking": {}, "validators": {}, "stakingToken": {}, "utilityToken": {}, "deposit": {} });
+    const [contractFn, updateContractFn] = useState({ "staking": {"withdraw": ""}, "validators": {}, "stakingToken": {"approve":"", "lock": "", "unlock": ""}, "utilityToken": {"approve": ""}, "deposit": {"amount": ""} });
     // Function list to show
     const [contractCard, setContractCard] = useState("tokens");
     // Initial connection lock
@@ -155,8 +155,7 @@ function Ethereum(props) {
 
     // Update contractFn from user input
     const handleChange = (fn, f, event) => {
-        let fields = contractFn;
-        if (!fields) { fields = {} }
+        let fields = JSON.parse(JSON.stringify(contractFn));
         if (!fields[fn]) {
             fields[fn] = {}
         }
@@ -237,7 +236,7 @@ function Ethereum(props) {
                         <Form>
                             <Form.Field>
                                 <h4>Deposit</h4>
-                                <label>Amount</label><input id="amount" onChange={(event) => { handleChange("deposit", "amount", event) }} placeholder="uint256" />
+                                <label>Amount</label><input value={contractFn["deposit"]["amount"]} onChange={(event) => { handleChange("deposit", "amount", event) }} placeholder="uint256" />
                                 <Button color="green" onClick={async (e) => { e.preventDefault(); await store.web3Adapter.deposit(contractFn["deposit"]["amount"]) }}>Send</Button>
                             </Form.Field>
                         </Form>
@@ -248,7 +247,7 @@ function Ethereum(props) {
                         <Form>
                             <Form.Field>
                                 <h4>Approve Deposit Allowance</h4>
-                                <label>Amount</label><input id="amount" onChange={(event) => { handleChange("utilityToken", "approve", event) }} placeholder="uint256" />
+                                <label>Amount</label><input value={contractFn["utilityToken"]["approve"]} onChange={(event) => { handleChange("utilityToken", "approve", event) }} placeholder="uint256" />
                                 <Button color="green" onClick={async (e) => { e.preventDefault(); await store.web3Adapter.approveUtilityAllowance(contractFn["utilityToken"]["approve"]) }}>Send</Button>
                             </Form.Field>
                         </Form>
@@ -267,7 +266,7 @@ function Ethereum(props) {
                     <Form>
                         <Form.Field>
                             <h4>Approve Staking Allowance</h4>
-                            <label>Amount</label><input id="amount" onChange={(event) => { handleChange("stakingToken", "approve", event) }} placeholder="uint256" />
+                            <label>Amount</label><input value={contractFn["stakingToken"]["approve"]} onChange={(event) => { handleChange("stakingToken", "approve", event) }} placeholder="uint256" />
                             <Button color="green" onClick={async (e) => { e.preventDefault(); await store.web3Adapter.approveStakingAllowance(contractFn["stakingToken"]["approve"]) }}>Send</Button>
                         </Form.Field>
                     </Form>
@@ -315,7 +314,7 @@ function Ethereum(props) {
                         <Form>
                             <Form.Field>
                                 <h4>Lock Stake</h4>
-                                <label>Amount</label><input id="amount" onChange={(event) => { handleChange("stakingToken", "lock", event) }} placeholder="uint256" />
+                                <label>Amount</label><input value={contractFn["stakingToken"]["lock"]} onChange={(event) => { handleChange("stakingToken", "lock", event) }} placeholder="uint256" />
                                 <Button color="red" onClick={async (e) => { e.preventDefault(); await store.web3Adapter.lockUnlockStake(contractFn["stakingToken"]["lock"], "lockStake") }}>Send</Button>
                             </Form.Field>
                         </Form>
@@ -326,7 +325,7 @@ function Ethereum(props) {
                         <Form>
                             <Form.Field>
                                 <h4>Unlock Stake</h4>
-                                <label>Amount</label><input id="amount" onChange={(event) => { handleChange("stakingToken", "unlock", event) }} placeholder="uint256" />
+                                <label>Amount</label><input value={contractFn["stakingToken"]["unlock"]} onChange={(event) => { handleChange("stakingToken", "unlock", event) }} placeholder="uint256" />
                                 <Button color="red" onClick={async (e) => { e.preventDefault(); await store.web3Adapter.lockUnlockStake(contractFn["stakingToken"]["unlock"], "unlockStake") }}>Send</Button>
                             </Form.Field>
                         </Form>
@@ -337,7 +336,7 @@ function Ethereum(props) {
                         <Form>
                             <Form.Field>
                                 <h4>Unlock Reward</h4>
-                                <Button color="red" onClick={async (e) => { e.preventDefault(); await store.web3Adapter.method("stakingToken", "unlockReward") }}>Send</Button>
+                                <Button color="red" onClick={async (e) => { e.preventDefault(); await store.web3Adapter.method("staking", "unlockReward") }}>Send</Button>
                             </Form.Field>
                         </Form>
                     </Card.Content>
@@ -357,8 +356,8 @@ function Ethereum(props) {
                         <Form>
                             <Form.Field>
                                 <h4>Withdraw</h4>
-                                <label>Amount</label><input id="amount" onChange={(event) => { handleChange("stakingToken", "withdraw", event) }} placeholder="uint256" />
-                                <Button color="red" onClick={async (e) => { e.preventDefault(); await store.web3Adapter.method("stakingToken", "withdraw", { "amount": contractFn["stakingToken"]["withdraw"]["amount"] }) }}>Send</Button>
+                                <label>Amount</label><input value={contractFn["staking"]["withdraw"]} onChange={(event) => { handleChange("staking", "withdraw", event) }} placeholder="uint256" />
+                                <Button color="red" onClick={async (e) => { e.preventDefault(); await store.web3Adapter.method("staking", "withdraw", { "amount": contractFn["staking"]["withdraw"] }) }}>Send</Button>
                             </Form.Field>
                         </Form>
                     </Card.Content>
@@ -369,7 +368,7 @@ function Ethereum(props) {
 
     const fnMenu = () => {
         // TODO: Use updated ABI and test methods
-        return (<></>)
+        //return (<></>)
 
         if (!store.web3Adapter || !store.web3Adapter.selectedAddress) {
             return (<></>)
@@ -384,17 +383,17 @@ function Ethereum(props) {
                         <Menu.Item
                             name='Tokens'
                             active={contractCard === 'tokens'}
-                            onClick={() => setContractCard('tokens')}
+                            onClick={() => {setContractCard('tokens')}}
                         />
                         <Menu.Item
                             name='Staking'
                             active={contractCard === 'staking'}
-                            onClick={() => setContractCard('staking')}
+                            onClick={() => {setContractCard('staking')}}
                         />
                         <Menu.Item
                             name='Validator'
                             active={contractCard === 'validator'}
-                            onClick={() => setContractCard('validator')}
+                            onClick={() => {setContractCard('validator')}}
                         />
                     </Menu>
                 </Grid.Column>
